@@ -1,5 +1,5 @@
 ---
-Name: secuurefiles-extensions
+Name: securefiles-extensions
 ---
 File:
   extensions:
@@ -8,7 +8,7 @@ File:
 #  extensions:
 #    ['SecureFileMemberPermissionDecorator']
 #File:
-#  extensions: 
+#  extensions:
 #    ['SecureFileGroupPermissionDecorator']
 #File:
 #  extensions:

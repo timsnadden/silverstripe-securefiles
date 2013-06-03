@@ -5,59 +5,59 @@
  * @package securefiles
  * @subpackage default
  * @author Hamish Campbell <hn.campbell@gmail.com>
- * @copyright copyright (c) 2010, Hamish Campbell 
+ * @copyright copyright (c) 2010, Hamish Campbell
  */
 class SecureFileController extends Controller implements PermissionProvider {
-	
+
 	/**
 	 * @var array Disallow all public actions on this controller
 	 */
-	public static $allowed_actions = array();
-	
+	private static $allowed_actions = array();
+
 	/**
 	 * @var string htaccess file as set by apache config
 	 */
 	protected static $htaccess_file = ".htaccess";
-	
+
 	/**
 	 * @var integer Size of output chunks in kb while in PHP fread mode.
 	 */
-	protected static $chunck_size_kb = 32;
-	
+	protected static $chunk_size_kb = 32;
+
 	/**
 	 * @var boolean Flag use X-Sendfile header mode instead of PHP fread mode.
 	 */
 	protected static $use_x_sendfile = false;
-	
+
 	/**
 	 * @var boolean Flag use SilverStripe send file method.
 	 */
 	protected static $use_ss_sendfile = false;
-	
+
 	/**
 	 * @var array i18n data for not authorized message as passed to _t
 	 */
 	protected static $i18n_not_authorized = array('SecureFiles.NOTAUTHORIZED', 'Not Authorized');
-	
+
 	/**
 	 * @var array i18n data for not found message as passed to _t
 	 */
 	protected static $i18n_not_found = array('SecureFiles.NOTFOUND', 'Not Found');
-	
+
 	/**
 	 * Use X-Sendfile headers to send files to the browser.
 	 * This is quicker than pushing files through PHP but
 	 * requires either Lighttpd or mod_xsendfile for Apache
-	 * @link http://tn123.ath.cx/mod_xsendfile/ 
+	 * @link http://tn123.ath.cx/mod_xsendfile/
 	 */
 	static function use_x_sendfile_method() {
 		self::use_default_sendfile_method();
 		self::$use_x_sendfile = true;
 	}
-	
+
 	/**
 	 * Use internal SilverStripe to send files to the browser.
-	 * This is the least efficient method but is useful for 
+	 * This is the least efficient method but is useful for
 	 * testing. Not recommend for production
 	 * environments.
 	 */
@@ -65,7 +65,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 		self::use_default_sendfile_method();
 		self::$use_ss_sendfile = true;
 	}
-	
+
 	/**
 	 * Use the default chuncked file method to send files to the browser.
 	 * This is the default method.
@@ -74,7 +74,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 		self::$use_ss_sendfile = false;
 		self::$use_x_sendfile = false;
 	}
-	
+
 	/**
 	 * Set the size of upload chunk in bytes.
 	 * @param int $kilobytes
@@ -82,9 +82,9 @@ class SecureFileController extends Controller implements PermissionProvider {
 	static function set_chunk_size($kilobytes) {
 		$kilobytes = max(0, (int)$kilobytes);
 		if(!$kilobytes) user_error("Invalid download chunk size", E_USER_ERROR);
-		self::$chunck_size_kb = $kilobytes;
+		self::$chunk_size_kb = $kilobytes;
 	}
-	
+
 	/**
 	 * Set the Apache access file name (.htaccess by default)
 	 * as determined by the AccessFileName Apache directive.
@@ -93,7 +93,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 	static function set_access_filename($filename) {
 		self::$htaccess_file = $filename;
 	}
-	
+
 	/**
 	 * Get the Apache access file name
 	 * @return string
@@ -101,7 +101,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 	static function get_access_filename() {
 		return self::$htaccess_file;
 	}
-	
+
 	/**
 	 * Set a 'not authorized' message to replace the standard string
 	 * @param $message HTML body of 401 Not Authorized response
@@ -110,7 +110,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 	static function set_not_authorized_text($message = "Not Authorized", $i18n = "SecureFiles.NOTAUTHORIZED") {
 		self::$i18n_not_authorized = array($i18n, $message);
 	}
-	
+
 	/**
 	 * Set a 'not found' message to replace the standard string
 	 * @param $message HTML body of 404 Not Found response
@@ -119,17 +119,27 @@ class SecureFileController extends Controller implements PermissionProvider {
 	static function set_not_found_text($message = "Not Found", $i18n = "SecureFiles.NOTFOUND") {
 		self::$i18n_not_found = array($i18n, $message);
 	}
-	
+
+	public function init() {
+		parent::init();
+		$this->action = 'index';
+		$this->request->action = 'index';
+	}
+
+	public function index() {
+		$x = 'I am index';
+		return $x;
+	}
 	/**
 	 * Process incoming requests passed to this controller
-	 * 
+	 *
 	 * @return HTTPResponse
 	 */
-	public function handleAction($request) {
+	public function handleAction($request, $action) {
 		$url = array_key_exists('url', $_GET) ? $_GET['url'] : $_SERVER['REQUEST_URI'];
 		$file_path = Director::makeRelative($url);
 		$file = File::find($file_path);
-		
+
 		if($file instanceof File) {
 			if ($file->canView()) {
 				$file->extend('onAccessGranted');
@@ -142,10 +152,11 @@ class SecureFileController extends Controller implements PermissionProvider {
 			return $this->fileNotFound(call_user_func_array('_t', self::$i18n_not_found));
 		}
 	}
-	
+
+
 	/**
 	 * File Not Found response
-	 * 
+	 *
 	 * @param $body Optional message body
 	 * @return HTTPResponse
 	 */
@@ -156,17 +167,17 @@ class SecureFileController extends Controller implements PermissionProvider {
 			return new HTTPResponse($body, 404);
 		}
 	}
-	
+
 	/**
 	 * File not authorized response
-	 * 
+	 *
 	 * @param $body Optional message body
 	 * @return HTTPResponse
 	 */
 	function fileNotAuthorized($body = "") {
 		Security::permissionFailure($this, $body);
 	}
-	
+
 	/**
 	 * File found response
 	 *
@@ -175,12 +186,12 @@ class SecureFileController extends Controller implements PermissionProvider {
 	 * example, resampled images.
 	 */
 	function fileFound(File $file, $alternate_path = null) {
-		
+
 		// File properties
 		$file_name = $file->Name;
 		$file_path = Director::getAbsFile($alternate_path ? $alternate_path : $file->FullPath);
 		$file_size = filesize($file_path);
-		
+
 		// Testing mode - return an HTTPResponse
 		if(self::$use_ss_sendfile) {
 			if(ClassInfo::exists('SS_HTTPRequest')) {
@@ -189,7 +200,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 				return HTTPRequest::send_file(file_get_contents($file_path), $file_name);
 			}
 		}
-		
+
 		// Normal operation:
 		$mimeType = HTTP::get_mime_type($file_name);
 		header("Content-Type: {$mimeType}; name=\"" . addslashes($file_name) . "\"");
@@ -197,7 +208,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 		header("Cache-Control: max-age=1, private");
 		header("Content-Length: {$file_size}");
 		header("Pragma: ");
-		
+
 		if(self::$use_x_sendfile) {
 			session_write_close();
 			header('X-Sendfile: '.$file_path);
@@ -207,7 +218,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 			$this->flush();
 			// Push the file while not EOF and connection exists
 			while(!feof($filePointer) && !connection_aborted()) {
-				print(fread($filePointer, 1024 * self::$chunck_size_kb));
+				print(fread($filePointer, 1024 * self::$chunk_size_kb));
 				$this->flush();
 			}
 			fclose($filePointer);
@@ -217,7 +228,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 			return $this->fileNotFound();
 		}
 	}
-	
+
 	/**
 	 * Flush the output buffer to the server (if possible).
 	 * @see http://nz.php.net/manual/en/function.flush.php#93531
@@ -230,10 +241,10 @@ class SecureFileController extends Controller implements PermissionProvider {
 		}
 		@ob_start();
 	}
-	
+
 	/**
 	 * Permission provider for access to secure files
-	 * 
+	 *
 	 * @return array
 	 */
 	function providePermissions() {
