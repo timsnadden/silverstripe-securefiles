@@ -50,8 +50,10 @@ class SecureFileTokenPermissionDecorator extends DataExtension {
 	public function updateCMSFields(FieldList $fields) {
 
 		// Only modify file objects with parent nodes
-		if( $this->owner instanceof Folder || !$this->owner->ID || !($this->owner instanceof File))
-			return;
+		if( $this->owner instanceof Folder ||
+		    !$this->owner->ID ||
+		    !$this->owner instanceof File
+			) { return; }
 
 		// Only if parent folder is secure
 		if ( !$this->owner->Parent()->Secured ) return;
@@ -69,7 +71,7 @@ class SecureFileTokenPermissionDecorator extends DataExtension {
 		$tokenList = GridField::create('AccessTokens', _t('SecureFiles.TOKENACCESSTITLE', 'Token Access'), $this->owner->AccessTokens(), SecureFileAccessToken::getGridFieldConfig());
 		$security->push($tokenList);
 
-		$fields->push($security);
+		$fields->addFieldstoTab( 'Root.Main', $security);
 	}
 
 	/**
