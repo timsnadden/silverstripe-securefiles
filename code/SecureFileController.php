@@ -127,7 +127,7 @@ class SecureFileController extends Controller implements PermissionProvider {
 	 *
 	 * @return HTTPResponse
 	 */
-	protected function handleAction($request, $action) {
+	function index(SS_HTTPRequest $request) {
 		$url = array_key_exists('url', $_GET) ? $_GET['url'] : $_SERVER['REQUEST_URI'];
 		$file_path = Director::makeRelative($url);
 		$file = File::find($file_path);
@@ -143,10 +143,6 @@ class SecureFileController extends Controller implements PermissionProvider {
 		} else {
 			return $this->fileNotFound(call_user_func_array('_t', self::$i18n_not_found));
 		}
-	}
-
-	public function index() {
-		return 'hi';
 	}
 
 	/**
