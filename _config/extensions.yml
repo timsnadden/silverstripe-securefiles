@@ -3,13 +3,4 @@ Name: securefiles-extensions
 ---
 File:
   extensions:
-    ['SecureFileDecorator']
-#File:
-#  extensions:
-#    ['SecureFileMemberPermissionDecorator']
-#File:
-#  extensions:
-#    ['SecureFileGroupPermissionDecorator']
-#File:
-#  extensions:
-#    ['SecureFileTokenPermissionDecorator']
+    ['SecureFileDecorator', 'SecureFileMemberPermissionDecorator', 'SecureFileGroupPermissionDecorator', 'SecureFileTokenPermissionDecorator']
