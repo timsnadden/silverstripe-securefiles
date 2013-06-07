@@ -9,10 +9,12 @@
  */
 class SecureFileController extends Controller implements PermissionProvider {
 
+	private static $url_handlers = array( '$Action' => 'index' );
+
 	/**
 	 * @var array Disallow all public actions on this controller
 	 */
-	private static $allowed_actions = array();
+	public static $allowed_actions = array();
 
 	/**
 	 * @var string htaccess file as set by apache config
@@ -120,22 +122,12 @@ class SecureFileController extends Controller implements PermissionProvider {
 		self::$i18n_not_found = array($i18n, $message);
 	}
 
-	public function init() {
-		parent::init();
-		$this->action = 'index';
-		$this->request->action = 'index';
-	}
-
-	public function index() {
-		$x = 'I am index';
-		return $x;
-	}
 	/**
 	 * Process incoming requests passed to this controller
 	 *
 	 * @return HTTPResponse
 	 */
-	public function handleAction($request, $action) {
+	protected function handleAction($request, $action) {
 		$url = array_key_exists('url', $_GET) ? $_GET['url'] : $_SERVER['REQUEST_URI'];
 		$file_path = Director::makeRelative($url);
 		$file = File::find($file_path);
@@ -153,6 +145,9 @@ class SecureFileController extends Controller implements PermissionProvider {
 		}
 	}
 
+	public function index() {
+		return 'hi';
+	}
 
 	/**
 	 * File Not Found response
