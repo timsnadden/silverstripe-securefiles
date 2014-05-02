@@ -1,0 +1,17 @@
+---
+Name: securefiles
+---
+
+Director:
+  rules:
+    'assets/$Action': 'SecureFileController'
+
+File:
+  extensions:
+    - SecureFileDecorator
+    - SecureFileMemberPermissionDecorator
+    - SecureFileGroupPermissionDecorator
+    - SecureFileTokenPermissionDecorator
+
+LeftAndMain:
+  extra_css_requirements: securefiles/css/SecureFiles.css
