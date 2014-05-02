@@ -17,6 +17,6 @@ define('MODULE_SECUREFILES_PATH', basename(dirname(__FILE__)));
 
 /**
  * For testing or debug purposes, you can force this module to use the internal
- * frmaework send file method. Not recommended for production sites.
+ * framework send file method. Not recommended for production sites.
  */
 // SecureFileController::use_ss_sendfile_method();
