@@ -1,19 +1,24 @@
 {
-	"name": "hamishcampbell/securefiles",
+	"name": "silverstripe/securefiles",
 	"description": "Adds a variety of security controls to your SilverStripe file assets",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe", "securefiles"],
 	"authors": [
 		{
 			"name": "Hamish Campbell",
-			"role": "Maintainer",
+			"role": "Author",
 			"homepage": "http://polemic.net.nz",
 			"email": "hn.campbell@gmail.com"
+		},
+		{
+			"name": "Tim Snadden",
+			"role": "Maintainer",
+			"email": "tim@snadden.com"
 		}
 	],
 	"require":
 	{
-		"silverstripe/framework": "3.*",
+		"silverstripe/framework": "3.1",
 		"composer/installers": "*"
 	}
 }
