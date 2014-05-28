@@ -15,3 +15,7 @@ File:
 
 LeftAndMain:
   extra_css_requirements: securefiles/css/SecureFiles.css
+
+SecureFileAccessToken:
+  singular_name: File Access Token
+  plural_name: File Access Tokens
